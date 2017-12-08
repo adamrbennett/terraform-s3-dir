@@ -14,6 +14,7 @@ import (
 )
 
 var exclude = getopt.ListLong("exclude", 'x', "", "glob patterns to exclude")
+var keyPrefix = getopt.StringLong("key-prefix", 'p', "", "prefix to set on all keys")
 var help = getopt.BoolLong("help", 'h', "", "print this help")
 
 func main() {
@@ -122,7 +123,7 @@ func main() {
 
 		resourcesMap[resourceName] = map[string]interface{}{
 			"bucket":       bucketName,
-			"key":          relPath,
+			"key":          *keyPrefix + relPath,
 			"source":       path,
 			"etag":         fmt.Sprintf("${md5(file(%q))}", path),
 			"content_type": contentType,
