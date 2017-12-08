@@ -15,6 +15,7 @@ import (
 
 var exclude = getopt.ListLong("exclude", 'x', "", "glob patterns to exclude")
 var keyPrefix = getopt.StringLong("key-prefix", 'p', "", "prefix to set on all keys")
+var acl = getopt.StringLong("acl", 'a', "", "the canned acl to use on all objects")
 var help = getopt.BoolLong("help", 'h', "", "print this help")
 
 func main() {
@@ -121,12 +122,19 @@ func main() {
 		hasher.Write([]byte(relPath))
 		resourceName := fmt.Sprintf("%x", hasher.Sum(nil))
 
+		// Default to private acl, if none provided
+		if acl == nil || *acl == "" {
+			s := "private"
+			acl = &s
+		}
+
 		resourcesMap[resourceName] = map[string]interface{}{
 			"bucket":       bucketName,
 			"key":          *keyPrefix + relPath,
 			"source":       path,
 			"etag":         fmt.Sprintf("${md5(file(%q))}", path),
 			"content_type": contentType,
+			"acl":          *acl,
 		}
 
 		return nil
